@@ -11,7 +11,42 @@ const scrolling = (upSelector) => {
         }
     });
 
-    const element = document.documentElement,
+    let links = document.querySelectorAll('[href^="#"]'),
+        speed = 0.2;
+
+    links.forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+
+            let withTop = document.documentElement.scrollTop,
+                hash = this.hash,
+                toBlock = document.querySelector(hash).getBoundingClientRect().top,
+                start = null;
+
+            requestAnimationFrame(step);
+
+            function step(time) {
+                if (start === null) {
+                    start = time;
+                }
+
+                let progress = time - start,
+                    r = (toBlock < 0 ? Math.max(withTop - progress/speed, withTop + toBlock) : Math.min(withTop + progress/speed, withTop + toBlock));
+
+                document.documentElement.scrollTo(0, r);
+
+                if (r != withTop + toBlock) {
+                    requestAnimationFrame(step);
+                } else {
+                    location.hash = hash;
+                }
+            }
+        });
+    });
+
+    // Pure js scrolling
+
+    /* const element = document.documentElement,
           body = document.body;
 
     const calcScroll = () => {
@@ -64,7 +99,7 @@ const scrolling = (upSelector) => {
         }, timeInterval);
     };
 
-    calcScroll();
+    calcScroll(); */
 };
 
 export default scrolling;
